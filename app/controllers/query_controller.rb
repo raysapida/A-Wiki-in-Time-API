@@ -19,11 +19,12 @@ class QueryController < ApplicationController
         upper_lat = lat + lat_shift
         lower_lng = long - long_shift
         upper_lng = long + long_shift
-        start_year = params[:date].to_i - params[:year_range].to_i
-        end_year = params[:date].to_i + params[:year_range].to_i
+        # start_year = params[:date].to_i - params[:year_range].to_i
+        # end_year = params[:date].to_i + params[:year_range].to_i
 
-        # start_year = params[:start_year].to_i
-        # end_year = params[:end_year].to_i
+        start_year = params[:start_year].to_i
+        end_year = params[:end_year].to_i
+
         if params[:polygon] == 'true'
             case type
             when 'battles'
