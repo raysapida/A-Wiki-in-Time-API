@@ -28,7 +28,7 @@ module Api
     config.api_only = true
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins 'http://localhost:8080'
+        origins 'https://a-wiki-in-time.herokuapp.com'
         resource '*', :headers => :any, :methods => [:get, :post, :options]
       end
     end
