@@ -1,0 +1,18 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *default
+  database: test-api_development
+
+test:
+  <<: *default
+  database: test-api_test
+
+production:
+  <<: *default
+  database: test-api_production
+  username: test-api
+  password: <%= ENV['TEST-API_DATABASE_PASSWORD'] %>
