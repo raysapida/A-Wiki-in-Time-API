@@ -52,7 +52,7 @@ class QueryController < ApplicationController
             render json: response
         else
 
-            @query = Query.create(latitude: lat, longitude: long, radius: radius, start_date: start_year, end_date: end_year, event_type: type)
+            # @query = Query.create(latitude: lat, longitude: long, radius: radius, start_date: start_year, end_date: end_year, event_type: type)
 
             if type == 'battles'
                 @events = Event.where(scraped_date: start_year..end_year).where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: ['battle', 'siege'])
@@ -69,9 +69,9 @@ class QueryController < ApplicationController
             end
 
             if @events
-                @events.each do |event|
-                    @queries_event = QueriesEvent.create(query_id: @query.id, event_id: event.id)
-                end
+                # @events.each do |event|
+                #     @queries_event = QueriesEvent.create(query_id: @query.id, event_id: event.id)
+                # end
                 response = {events: @events}
             else
                 response = {error: "No events found"}
