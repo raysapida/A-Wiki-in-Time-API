@@ -38,7 +38,12 @@ class QueryController < ApplicationController
             when 'assassinations'
                 @events = Event.where.not(latitude: nil).where(event_type: 'assassination');
             else
-                @events = Event.where.not(latitude: nil);
+                @events = Event.where(scraped_date: start_year..end_year).where.not(latitude: nil).where(event_type: ['battle', 'siege']);
+                @events += Event.where.not(latitude: nil).where(event_type: 'archaeological site');
+                @events += Event.where.not(latitude: nil).where(event_type: 'explorer');
+                @events += Event.where.not(latitude: nil).where(point_in_time: DateTime.new(start_year)..DateTime.new(end_year)).where(event_type: ['earthquake', 'volcano', 'tornado']);
+                @events += Event.where.not(latitude: nil).where(event_type: 'assassination');
+
             end
 
             if @events
