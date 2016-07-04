@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 
-gem 'rails', '>= 5.0.0.rc2', '< 5.1'
+gem 'rails'
 gem 'pg'
 gem 'puma', '~> 3.0'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
