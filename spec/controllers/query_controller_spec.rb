@@ -12,14 +12,6 @@ RSpec.describe QueryController, :type => :controller do
         end_year: '1870'
       } }
 
-      let(:disaster_params) { {
-        radius: '300',
-        lat: '37.819302695136',
-        long: '-122.19968309374997',
-        type: 'natural_disasters',
-        start_year: '1900',
-        end_year: '1920'
-      } }
 
       it 'should give a success status' do
         post :create, params: battle_params, xhr: true
@@ -51,6 +43,15 @@ RSpec.describe QueryController, :type => :controller do
       end
 
       it 'returns a disaster  within the given radius' do
+        params = {
+          radius: '300',
+          lat: '37.819302695136',
+          long: '-122.19968309374997',
+          type: 'natural_disasters',
+          start_year: '1900',
+          end_year: '1920'
+        }
+
         sf_earthquake = Event.create({
           title: '1906 San Francisco earthquake',
           event_url: 'https://en.wikipedia.org/wiki/1906_San_Francisco_earthquake',
@@ -58,13 +59,38 @@ RSpec.describe QueryController, :type => :controller do
           event_type: 'earthquake',
           point_in_time: DateTime.new(1906),
           latitude: 37.75,
-          longitude: -122.55,
+          longitude: -122.55
         })
 
-        post :create, params: disaster_params, xhr: true
+        post :create, params: params, xhr: true
+
         parsed_response = JSON.parse(response.body)
         event = parsed_response['events'].first
         expect(event['qID']).to eq sf_earthquake.qID
+      end
+
+      it 'returns an archaeological site  within the given radius' do
+        params = {
+          radius: '300',
+          lat: '37.819302695136',
+          long: '-122.19968309374997',
+          type: 'archaeological_sites'
+        }
+
+        emeryville = Event.create({
+          title: 'Emeryville Shellmound',
+          event_url: 'https://en.wikipedia.org/wiki/Emeryville_Shellmound',
+          qID: 'Q211386',
+          event_type: 'archaeological site',
+          latitude: 37.834,
+          longitude: -122.29263
+        })
+
+        post :create, params: params, xhr: true
+
+        parsed_response = JSON.parse(response.body)
+        event = parsed_response['events'].first
+        expect(event['qID']).to eq emeryville.qID
       end
     end
   end
