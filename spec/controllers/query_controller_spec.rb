@@ -187,6 +187,44 @@ RSpec.describe QueryController, :type => :controller do
         expect(qIDs).to include larry.qID
         expect(qIDs).to include robert.qID
       end
+
+      it 'excludes events not within the raidus and time span' do
+        params = {
+          radius: '400',
+          lat: '37.819302695136',
+          long: '-122.19968309374997',
+          start_year: '1900',
+          end_year: '1920'
+        }
+
+        Event.create({
+          title: '1906 San Francisco earthquake',
+          event_url: 'https://en.wikipedia.org/wiki/1906_San_Francisco_earthquake',
+          qID: 'Q211386',
+          event_type: 'earthquake',
+          point_in_time: DateTime.new(1906),
+          latitude: 37.75,
+          longitude: -122.55
+        })
+
+
+        griswoldville = Event.create({
+          title: 'Battle of Griswoldville',
+          scraped_date: 1864,
+          event_url: 'https://en.wikipedia.org/wiki/Battle_of_Griswoldville',
+          qID: 'Q2888696',
+          event_type: 'battle',
+          latitude: 32.52030,
+          longitude: -83.281013
+        })
+
+        post :create, params: params, xhr: true
+
+        parsed_response = JSON.parse(response.body)
+        events = parsed_response['events']
+        qIDs = events.map{|event| event['qID']}
+        expect(qIDs).not_to include griswoldville.qID
+      end
     end
   end
 
