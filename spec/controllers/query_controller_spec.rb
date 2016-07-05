@@ -92,6 +92,30 @@ RSpec.describe QueryController, :type => :controller do
         event = parsed_response['events'].first
         expect(event['qID']).to eq emeryville.qID
       end
+
+      it 'returns an explorer within the given radius' do
+        params = {
+          radius: '300',
+          lat: '37.819302695136',
+          long: '-122.19968309374997',
+          type: 'explorers'
+        }
+
+        robert = Event.create({
+          title: 'Robert S. Williamson',
+          event_url: 'https://en.wikipedia.org/wiki/Robert_S._Williamson',
+          qID: 'Q7349523',
+          event_type: 'explorer',
+          latitude: 37.778067677511686,
+          longitude: -122.41803636523434
+        })
+
+        post :create, params: params, xhr: true
+
+        parsed_response = JSON.parse(response.body)
+        event = parsed_response['events'].first
+        expect(event['qID']).to eq robert.qID
+      end
     end
   end
 
