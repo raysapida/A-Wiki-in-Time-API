@@ -31,4 +31,25 @@ class Event < ApplicationRecord
       @events = Event.where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng)
     end
   end
+
+  def self.polygon_query(type, start_year, end_year)
+      case type
+      when 'battles'
+        Event.battles_and_sieges(start_year, end_year).where.not(latitude: nil)
+      when 'archaeological_sites'
+        Event.archaeological_sites.where.not(latitude: nil);
+      when 'explorers'
+        Event.explorers.where.not(latitude: nil)
+      when 'natural_disasters'
+        Event.natural_disasters(start_year, end_year).where.not(latitude: nil)
+      when 'assassinations'
+        Event.assassinations.where.not(latitude: nil)
+      else
+        all_of_the_above = Event.battles_and_sieges(start_year, end_year).where.not(latitude: nil)
+        all_of_the_above += Event.archaeological_sites.where.not(latitude: nil);
+        all_of_the_above += Event.explorers.where.not(latitude: nil)
+        all_of_the_above += Event.natural_disasters(start_year, end_year).where.not(latitude: nil)
+        all_of_the_above += Event.assassinations.where.not(latitude: nil)
+      end
+  end
 end

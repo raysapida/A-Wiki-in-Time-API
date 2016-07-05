@@ -7,35 +7,8 @@ class QueryController < ApplicationController
     lower_lat, upper_lat, lower_lng, upper_lng = destructure_latlong_bounds(lat, long, radius)
 
     if params[:polygon] == 'true'
-      case type
-      when 'battles'
-        @events = Event.where(scraped_date: start_year..end_year).where.not(latitude: nil).where(event_type: ['battle', 'siege']);
-      when 'archaeological_sites'
-        @events = Event.where.not(latitude: nil).where(event_type: 'archaeological site');
-      when 'explorers'
-        @events = Event.where.not(latitude: nil).where(event_type: 'explorer');
-      when 'natural_disasters'
-        @events = Event.where.not(latitude: nil).where(point_in_time: DateTime.new(start_year)..DateTime.new(end_year)).where(event_type: ['earthquake', 'volcano', 'tornado']);
-      when 'assassinations'
-        @events = Event.where.not(latitude: nil).where(event_type: 'assassination');
-      else
-        @events = Event.where(scraped_date: start_year..end_year).where.not(latitude: nil).where(event_type: ['battle', 'siege']);
-        @events += Event.where.not(latitude: nil).where(event_type: 'archaeological site');
-        @events += Event.where.not(latitude: nil).where(event_type: 'explorer');
-        @events += Event.where.not(latitude: nil).where(point_in_time: DateTime.new(start_year)..DateTime.new(end_year)).where(event_type: ['earthquake', 'volcano', 'tornado']);
-        @events += Event.where.not(latitude: nil).where(event_type: 'assassination');
-
-      end
-
-      if @events
-        # @events.each do |event|
-        #     @queries_event = QueriesEvent.create(query_id: @query.id, event_id: event.id)
-        # end
-        response = {events: @events, polygon: true}
-      else
-        response = {error: "No events found"}
-      end
-      render json: response
+      @events = Event.polygon_query(type, start_year, end_year)
+      render json: {events: @events, polygon: true}
     else
       @events = Event.radius_query(type, lower_lat, upper_lat, lower_lng, upper_lng, start_year, end_year)
       render json: {events: @events}
