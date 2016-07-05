@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe QueryController, :type => :controller do
   describe 'POST #create' do
-    describe 'with polygon input empty' do
+    describe 'with radius query' do
       let(:battle_params) { {
         radius: '300',
         lat: '33.280916241006025',

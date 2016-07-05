@@ -37,32 +37,8 @@ class QueryController < ApplicationController
       end
       render json: response
     else
-
-      # @query = Query.create(latitude: lat, longitude: long, radius: radius, start_date: start_year, end_date: end_year, event_type: type)
-
-      if type == 'battles'
-        @events = Event.where(scraped_date: start_year..end_year).where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: ['battle', 'siege'])
-      elsif type == 'archaeological_sites'
-        @events = Event.where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: 'archaeological site')
-      elsif type == 'assassinations'
-        @events = Event.where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: 'assassination')
-      elsif type == 'natural_disasters'
-        @events = Event.where(point_in_time: DateTime.new(start_year)..DateTime.new(end_year)).where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: ['earthquake', 'volcano', 'tornado'])
-      elsif type == 'explorers'
-        @events = Event.where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng).where(event_type: 'explorer')
-      else
-        @events = Event.where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng)
-      end
-
-      if @events
-        # @events.each do |event|
-        #     @queries_event = QueriesEvent.create(query_id: @query.id, event_id: event.id)
-        # end
-        response = {events: @events}
-      else
-        response = {error: "No events found"}
-      end
-      render json: response
+      @events = Event.radius_query(type, lower_lat, upper_lat, lower_lng, upper_lng, start_year, end_year)
+      render json: {events: @events}
     end
   end
 
