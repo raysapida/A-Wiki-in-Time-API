@@ -15,7 +15,7 @@ class Event < ApplicationRecord
   }
   scope :assasinations, -> { where(event_type: 'assassination')  }
 
-  def self.radius_query(type, lower_lat, upper_lat, lower_lng, upper_lng, start_year, end_year)
+  def self.radius_query(type:, lower_lat:, upper_lat:, lower_lng:, upper_lng:, start_year:, end_year:,  **_)
     case type
     when 'battles'
       Event.battles_and_sieges(start_year, end_year).where(latitude: lower_lat..upper_lat).where(longitude: lower_lng..upper_lng)
@@ -32,7 +32,7 @@ class Event < ApplicationRecord
     end
   end
 
-  def self.polygon_query(type, start_year, end_year)
+  def self.polygon_query(type:, start_year:, end_year:,  **_)
       case type
       when 'battles'
         Event.battles_and_sieges(start_year, end_year).where.not(latitude: nil)

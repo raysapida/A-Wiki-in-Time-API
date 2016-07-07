@@ -3,14 +3,14 @@ class QueryController < ApplicationController
   LONGITUDE_CONVERTER = 111.320
 
   def create
-    radius, lat, long, type, start_year, end_year = destructure_params(params)
-    lower_lat, upper_lat, lower_lng, upper_lng = destructure_latlong_bounds(lat, long, radius)
+    parameters = coerce_number_params(params)
 
     if params[:polygon] == 'true'
-      @events = Event.polygon_query(type, start_year, end_year)
+      @events = Event.polygon_query(parameters)
       render json: {events: @events, polygon: true}
     else
-      @events = Event.radius_query(type, lower_lat, upper_lat, lower_lng, upper_lng, start_year, end_year)
+      updated_parameters = add_latlong_bounds(parameters)
+      @events = Event.radius_query(updated_parameters)
       render json: {events: @events}
     end
   end
@@ -18,18 +18,25 @@ class QueryController < ApplicationController
 
   private
 
-  def destructure_params(params)
-    [params[:radius].to_i, params[:lat].to_f,
-     params[:long].to_f, params[:type],
-     params[:start_year].to_i, params[:end_year].to_i]
+  def coerce_number_params(params)
+    {radius: params[:radius].to_i,
+     lat: params[:lat].to_f,
+     long: params[:long].to_f,
+     type: params[:type],
+     start_year: params[:start_year].to_i,
+     end_year: params[:end_year].to_i}
   end
 
-  def destructure_latlong_bounds(lat, long, radius)
-    radians = lat/180*Math::PI
-    lat_shift = radius/LATITUDE_CONVERTER
-    long_shift = radius/(LONGITUDE_CONVERTER*Math.cos(radians))
+  def add_latlong_bounds(parameters = {})
+    radians = parameters[:lat]/180*Math::PI
+    lat_shift = parameters[:radius]/LATITUDE_CONVERTER
+    long_shift = parameters[:radius]/(LONGITUDE_CONVERTER*Math.cos(radians))
 
-    [ (lat - lat_shift), (lat + lat_shift),
-      (long - long_shift), (long + long_shift)]
+    parameters.merge({
+      lower_lat: (parameters[:lat] - lat_shift),
+      upper_lat: (parameters[:lat] + lat_shift),
+      lower_lng: (parameters[:long] - long_shift),
+      upper_lng: (parameters[:long] + long_shift)
+    })
   end
 end
