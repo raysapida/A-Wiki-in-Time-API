@@ -3,6 +3,7 @@ class Event < ApplicationRecord
   # has_many :queries, through: :queries_events
   # has_many :queries_events
   validates_presence_of :qID, :latitude, :longitude, :event_type
+  validates_uniqueness_of :qID
 
   scope :battles_and_sieges, ->(start, finish) {
     where(event_type: ['battle', 'siege']).where(scraped_date: start..finish) 
